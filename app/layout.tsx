@@ -13,16 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { Metadata } from 'next';
+
 export const metadata: Metadata = {
   title: "TelMedKonnect",
   description: "Your Truly Unified Medical Connect Experience",
+  metadataBase: new URL('https://telmedkonnect.conquerorfoundation.com'), // At the top level
   openGraph: {
     title: "TelMedKonnect",
     description: "Your Truly Unified Medical Connect Experience",
-    metadataBase: new URL('https://telmedkonnect.conquerorfoundation.com'), // Replace with your actual domain
     images: [
       {
-        url: '/images/telmedkonnect.png', // Replace with the actual path to your image
+        url: '/images/telmedkonnect.png',
         width: 1200,
         height: 630,
         alt: 'TelMedKonnect Open Graph Image',
@@ -35,12 +37,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "TelMedKonnect",
     description: "Your Truly Unified Medical Connect Experience",
-    images: ['/images/telmedkonnect.png'], // Replace with the actual path to your image
+    images: ['/images/telmedkonnect.png'],
   },
   icons: {
-    icon: '/images/favicon.ico', // Ensure this path is correct
-    apple: '/images/apple-touch-icon.png', // Optional: for Apple devices
-    // You can add more icon sizes and types as needed
+    icon: '/images/favicon.ico',
+    apple: '/images/apple-touch-icon.png',
   },
 };
 
