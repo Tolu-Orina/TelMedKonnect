@@ -11,7 +11,7 @@ resource "aws_amplify_app" "telmedkonnect" {
   repository = "https://github.com/Tolu-Orina/TelMedKonnect.git"
   
   # GitHub personal access token
-  access_token = "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"
+  access_token = "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"
   
   platform = "WEB_COMPUTE" ## FOR NEXT JS APPS
 
