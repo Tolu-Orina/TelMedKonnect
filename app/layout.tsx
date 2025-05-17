@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "TelMedKonnect",
     description: "Your Truly Unified Medical Connect Experience",
+    metadataBase: new URL('https://telmedkonnect.conquerorfoundation.com'), // Replace with your actual domain
     images: [
       {
         url: '/images/telmedkonnect.png', // Replace with the actual path to your image
