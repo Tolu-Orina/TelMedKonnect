@@ -1,0 +1,95 @@
+/
+├── app/
+│   ├── (landing)/
+│   │   └── page.tsx                 # Landing Page
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx             # Login Screen
+│   │   ├── signup/
+│   │   │   └── page.tsx             # Signup Screen
+│   │   ├── forgot-password/
+│   │   │   └── page.tsx             # Password Recovery
+│   │   └── verification/
+│   │       └── page.tsx             # OTP Verification
+│   ├── dashboard/
+│   │   ├── patient/
+│   │   │   ├── layout.tsx           # Patient Dashboard Layout
+│   │   │   ├── page.tsx             # Patient Main Dashboard
+│   │   │   ├── appointments/
+│   │   │   │   └── [id]/page.tsx    # Consultation Chat Interface
+│   │   │   └── medical-history/
+│   │   │       └── page.tsx         # Medical Records
+│   │   ├── doctor/
+│   │   │   ├── layout.tsx           # Doctor Dashboard Layout
+│   │   │   ├── page.tsx             # Doctor Main Dashboard
+│   │   │   ├── schedule/
+│   │   │   │   └── page.tsx         # Availability Management
+│   │   │   └── patients/
+│   │   │       └── [id]/page.tsx    # Patient Profile
+│   │   └── partner/
+│   │       ├── layout.tsx           # Partner Dashboard Layout
+│   │       ├── page.tsx             # Partner Overview
+│   │       ├── users/
+│   │       │   └── page.tsx         # User Management
+│   │       └── settings/
+│   │           └── page.tsx         # Tenant Configuration
+│   ├── onboarding/
+│   │   └── partner/
+│   │       └── page.tsx             # Partner Onboarding Flow
+│   ├── components/
+│   │   ├── ui/                      # shadcn/ui components
+│   │   ├── chatbot/
+│   │   │   └── medi-buddy.tsx       # AI Chatbot Component
+│   │   └── shared/                  # Reusable components
+│   ├── hooks/                       # Custom hooks
+│   ├── lib/                         # Utilities/helpers
+│   └── public/
+│       ├── partners/                # Partner logos
+│       └── assets/                  # Global assets
+└── tailwind.config.js
+Key Screens Flow:
+
+Landing Page (/(landing)/page.tsx)
+
+Entry point with hero section, features, and CTAs
+Navigation to auth screens or partner info
+Authentication Flow (/(auth)/*)
+
+/login → Login form
+/signup → Role-based registration
+/forgot-password → Password recovery
+/verification → OTP/Email confirmation
+Patient Dashboard (/dashboard/patient/*)
+
+Main dashboard: Appointments overview
+/appointments/[id]: Chat interface
+/medical-history: Records management
+Doctor Dashboard (/dashboard/doctor/*)
+
+Main dashboard: Schedule and consultations
+/schedule: Availability calendar
+/patients/[id]: Patient profile view
+Partner Dashboard (/dashboard/partner/*)
+
+Main dashboard: Organization metrics
+/users: Staff management
+/settings: Tenant configuration
+Partner Onboarding (/onboarding/partner)
+
+Multi-step form for organization setup
+Tenant creation and branding configuration
+Special Components:
+
+components/chatbot/medi-buddy.tsx: Persistent AI chatbot widget
+components/shared/consultation-chat.tsx: Reusable chat interface
+components/shared/calendar.tsx: Booking system component
+This structure maintains:
+
+Role-based route segregation
+Proper layout nesting
+Clear separation of concerns
+Easy scalability for new features
+Shared component accessibility
+TypeScript-first approach
+Tailwind CSS utility classes
+shadcn/ui component integration

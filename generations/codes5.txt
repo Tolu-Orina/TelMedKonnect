@@ -1,0 +1,273 @@
+Reasoning: Okay, let's tackle this step by step. The user asked for the Forgot Password screen and Cognito setup steps. 
+
+First, I need to create the Forgot Password screen. It should have a form to enter the email, handle sending the reset code, and then a step to enter the new password and the code. Maybe split it into two parts: requesting the code and resetting the password. I'll use Zod for validation, React Hook Form, and shadcn components to match the previous screens.
+
+Next, the Cognito setup. The user wants step-by-step instructions. I should outline creating a User Pool, configuring attributes, policies, MFA, app clients, and triggers. Need to be clear so someone new can follow. Also, include environment variables for the frontend.
+
+Wait, the Forgot Password flow in Cognito requires a client ID. I should mention that in the setup steps. Also, when testing, the user needs to confirm their email before resetting the password, so maybe include a note about that.
+
+For the code, make sure to handle both steps: sending the code and submitting the new password with the code. Use AWS Amplify's Auth.forgotPassword and Auth.forgotPasswordSubmit methods. Handle loading states and errors. Also, navigate between steps using state.
+
+Check if the previous screens used specific styling or components, like Card, to keep consistency. Also, ensure the error messages are displayed properly and the forms are accessible.
+
+Need to test the Cognito setup steps to make sure they're accurate. Maybe include screenshots or links to the AWS console if possible, but since it's text, describe each section clearly.
+
+Finally, summarize the steps to test the auth flow: signup, verify, login, forgot password. Make sure the user knows how to test each part once Cognito is set up.
+
+
+
+
+Here's the **Forgot Password Flow** and **AWS Cognito Setup** instructions:
+
+### 1. Forgot Password Screens
+
+```tsx
+// app/(auth)/forgot-password/page.tsx
+
+'use client'
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Auth } from 'aws-amplify'
+import { useState } from 'react'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  code: z.string().min(6, "Code must be 6 characters").optional(),
+  newPassword: z.string().min(8, "Password must be at least 8 characters").optional()
+})
+
+export default function ForgotPasswordPage() {
+  const router = useRouter()
+  const [step, setStep] = useState<1 | 2>(1)
+  const [email, setEmail] = useState('')
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: '', code: '', newPassword: '' }
+  })
+
+  async function handleSendCode(values: z.infer<typeof formSchema>) {
+    try {
+      await Auth.forgotPassword(values.email)
+      setEmail(values.email)
+      setStep(2)
+    } catch (error) {
+      form.setError('root', { type: 'manual', message: (error as Error).message })
+    }
+  }
+
+  async function handleResetPassword(values: z.infer<typeof formSchema>) {
+    if (!values.code || !values.newPassword) return
+    
+    try {
+      await Auth.forgotPasswordSubmit(
+        email,
+        values.code,
+        values.newPassword
+      )
+      router.push('/auth/login?reset=success')
+    } catch (error) {
+      form.setError('root', { type: 'manual', message: (error as Error).message })
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center">
+      <div className="mx-auto w-full max-w-md px-4">
+        <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+          <CardHeader className="text-center space-y-1">
+            <h1 className="text-2xl font-bold">
+              {step === 1 ? 'Reset Password' : 'New Password'}
+            </h1>
+            <p className="text-gray-600">
+              {step === 1 
+                ? 'Enter your email to receive a reset code'
+                : `Enter code sent to ${email} and new password`}
+            </p>
+          </CardHeader>
+
+          <CardContent>
+            <Form {...form}>
+              <form 
+                onSubmit={form.handleSubmit(step === 1 ? handleSendCode : handleResetPassword)}
+                className="space-y-6"
+              >
+                {form.formState.errors.root && (
+                  <p className="text-sm font-medium text-destructive">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
+
+                {step === 1 ? (
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="name@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Verification Code</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="123456" 
+                              className="text-center text-lg font-mono"
+                              maxLength={6} 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="newPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  {step === 1 ? 'Send Reset Code' : 'Reset Password'}
+                </Button>
+
+                <div className="text-center text-sm text-gray-600">
+                  Remember your password?{' '}
+                  <Link href="/auth/login" className="text-blue-600 hover:underline">
+                    Login
+                  </Link>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+```
+
+### 2. AWS Cognito Setup Steps
+
+**Step 1: Create User Pool**
+1. Go to [AWS Cognito Console](https://console.aws.amazon.com/cognito/)
+2. Choose "User Pools" > "Create user pool"
+3. Select:
+   - **Sign-in options**: Email
+   - **Password policy**: Custom (minimum 8 characters)
+   - **MFA**: Optional (recommend "No MFA")
+   - **User account recovery**: Email only
+
+**Step 2: Configure Attributes**
+1. Under "Attributes":
+   - Keep standard attributes: email (required)
+   - Add custom attributes:
+     - `custom:role` (String)
+     - `custom:specialty` (String)
+     - `custom:license` (String)
+     - `custom:org_name` (String)
+
+**Step 3: Set Up App Client**
+1. Go to "App integration" > "App client"
+2. Create new app client:
+   - Name: `TelMedkonnectWebClient`
+   - Uncheck "Generate client secret"
+   - Auth flows: ALLOW_REFRESH_TOKEN_AUTH, ALLOW_USER_PASSWORD_AUTH
+   - OAuth 2.0: Optional (enable later for social login)
+
+**Step 4: Configure Message Templates**
+1. Under "Messaging" > "Email templates":
+   - Customize verification/reset emails
+   - From address: Use SES verified email
+
+**Step 5: Enable Triggers (Optional)**
+1. Under "Lambda triggers":
+   - "Pre Sign-up" - For validating registrations
+   - "Post Confirmation" - For post-signup workflows
+   - "Custom Message" - For custom email templates
+
+**Step 6: Create Domain**
+1. Under "App integration" > "Domain name":
+   - Create domain (e.g., `telmedkonnect-auth`)
+   - Save domain name for callback URLs
+
+**Step 7: Environment Variables**
+Add these to your Next.js `.env.local`:
+```bash
+NEXT_PUBLIC_AWS_REGION=your_region
+NEXT_PUBLIC_USER_POOL_ID=your_pool_id
+NEXT_PUBLIC_USER_POOL_CLIENT_ID=your_client_id
+```
+
+### Testing Flow Checklist
+1. **Sign Up**
+   ```bash
+   curl -X POST --data '{
+     "email": "test@example.com",
+     "password": "Test1234!",
+     "role": "patient"
+   }' https://your-api-endpoint/signup
+   ```
+   
+2. **Verify Email**
+   - Check inbox for verification code
+   - Submit code via verification screen
+
+3. **Login**
+   ```bash
+   aws cognito-idp admin-initiate-auth \
+     --user-pool-id YOUR_POOL_ID \
+     --client-id YOUR_CLIENT_ID \
+     --auth-flow ADMIN_USER_PASSWORD_AUTH \
+     --auth-parameters USERNAME=test@example.com,PASSWORD=Test1234!
+   ```
+
+4. **Forgot Password**
+   - Initiate from login screen
+   - Check email for reset code
+   - Submit new password via reset flow
+
+### Important Notes
+1. Make sure your SES email is verified for sending emails
+2. Use `aws-amplify` v6+ for best TypeScript support
+3. Enable CORS in API Gateway for local development
+4. Initial user status after signup will be "FORCE_CHANGE_PASSWORD" until verification
+
+Would you like me to provide the AWS CDK setup code for infrastructure-as-code deployment instead of console setup?

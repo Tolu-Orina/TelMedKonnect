@@ -1,0 +1,792 @@
+Reasoning: I need to adjust my implementation to match the provided folder structure and incorporate a consistent navigation style. Here's my revised plan:
+
+1. First, let me understand the correct file paths:
+   - The Patient Dashboard should be in `app/dashboard/patient/page.tsx` (not in `/app/(dashboard)/patient/dashboard/page.tsx` as I implemented)
+   - The layout file should be in `app/dashboard/patient/layout.tsx`
+
+2. The navbar should be similar to the landing page with:
+   - Logo (Stethoscope icon + "TelMedkonnect" text)
+   - Navigation links (but adjusted for authenticated users)
+   - Logout functionality instead of Login
+
+3. The overall dashboard structure should remain similar but be properly organized according to the folder structure.
+
+Let me create the revised implementation:
+
+1. Patient Dashboard Layout (`app/dashboard/patient/layout.tsx`)
+2. Patient Dashboard Page (`app/dashboard/patient/page.tsx`)
+
+For the layout, I'll create a consistent navbar that includes the logo and navigation appropriate for authenticated patients, including the logout option. The layout will wrap all patient dashboard pages.
+
+For the dashboard page, I'll keep the core functionality but adjust the styling and structure to match the provided example.
+
+# Corrected Patient Dashboard Implementation
+
+I'll adjust the implementation to match the correct folder structure and navigation style:
+
+```tsx
+// app/dashboard/patient/layout.tsx
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Stethoscope, Menu, User, Bell, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+export default function PatientDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header/Navbar */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <nav className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Stethoscope className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold text-gray-900">TelMedkonnect</span>
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden space-x-6 lg:flex items-center">
+              <Link href="/dashboard/patient" className="text-gray-600 hover:text-blue-600">
+                Dashboard
+              </Link>
+              <Link href="/dashboard/patient/appointments" className="text-gray-600 hover:text-blue-600">
+                Appointments
+              </Link>
+              <Link href="/dashboard/patient/medical-history" className="text-gray-600 hover:text-blue-600">
+                Medical Records
+              </Link>
+              
+              {/* Notification Bell */}
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  2
+                </span>
+              </Button>
+              
+              {/* User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/avatars/patient.jpg" alt="John Peterson" />
+                      <AvatarFallback>JP</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-700">John Peterson</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/patient/profile">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/login">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            
+            {/* Mobile Navigation Button */}
+            <Button 
+              variant="ghost" 
+              className="lg:hidden flex items-center"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <Menu className="h-6 w-6 mr-2" />
+              Menu
+            </Button>
+          </div>
+          
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="lg:hidden pt-2 pb-3 space-y-1">
+              <Link 
+                href="/dashboard/patient" 
+                className="block py-2 px-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/dashboard/patient/appointments" 
+                className="block py-2 px-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Appointments
+              </Link>
+              <Link 
+                href="/dashboard/patient/medical-history" 
+                className="block py-2 px-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Medical Records
+              </Link>
+              <Link 
+                href="/dashboard/patient/profile" 
+                className="block py-2 px-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+              <Link 
+                href="/login" 
+                className="block py-2 px-3 text-base font-medium rounded-md text-red-600 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Log out
+              </Link>
+            </div>
+          )}
+        </nav>
+      </header>
+      
+      {/* Main Content */}
+      <main className="pb-8">
+        {children}
+      </main>
+    </div>
+  )
+}
+```
+
+Now let's implement the Patient Dashboard page:
+
+```tsx
+// app/dashboard/patient/page.tsx
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { format, addDays } from "date-fns"
+import { CalendarDays, Clock, MessageSquare, Plus, FileText, Calendar } from "lucide-react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+export default function PatientDashboard() {
+  const [showChatbot, setShowChatbot] = useState(false)
+  
+  // Mock data for upcoming appointments
+  const upcomingAppointments = [
+    {
+      id: "apt-1234",
+      doctorName: "Dr. Sarah Wilson",
+      specialty: "Hematology",
+      date: addDays(new Date(), 2),
+      time: "10:30 AM",
+      status: "confirmed",
+      avatar: "/avatars/doctor-1.jpg"
+    },
+    {
+      id: "apt-2345",
+      doctorName: "Dr. Michael Chen",
+      specialty: "Cardiology",
+      date: addDays(new Date(), 5),
+      time: "2:15 PM",
+      status: "confirmed", 
+      avatar: "/avatars/doctor-2.jpg"
+    }
+  ]
+  
+  // Mock data for past appointments
+  const pastAppointments = [
+    {
+      id: "apt-0123",
+      doctorName: "Dr. Emily Rodriguez",
+      specialty: "Dermatology",
+      date: addDays(new Date(), -7),
+      time: "9:00 AM",
+      status: "completed",
+      avatar: "/avatars/doctor-3.jpg"
+    },
+    {
+      id: "apt-9012",
+      doctorName: "Dr. James Lee",
+      specialty: "Orthopedics",
+      date: addDays(new Date(), -14),
+      time: "3:45 PM",
+      status: "completed",
+      avatar: "/avatars/doctor-4.jpg"
+    }
+  ]
+  
+  return (
+    <div>
+      {/* Dashboard Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Banner */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Welcome back, John</h1>
+          <p className="text-gray-600">Manage your appointments and health records</p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left sidebar */}
+          <div className="lg:col-span-1">
+            <div className="space-y-6">
+              {/* User profile card */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl">Your Health Summary</CardTitle>
+                  <CardDescription>Last updated {format(new Date(), "MMMM d, yyyy")}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src="/avatars/patient.jpg" alt="John Peterson" />
+                      <AvatarFallback>JP</AvatarFallback>
+                    </Avatar>
+                    <h3 className="mt-4 text-lg font-medium">John Peterson</h3>
+                    <p className="text-sm text-gray-500">
+                      Patient since {format(new Date('2022-03-15'), "MMMM yyyy")}
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-4" asChild>
+                      <Link href="/dashboard/patient/profile">
+                        Update Profile
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Quick actions */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button className="w-full justify-start" variant="outline" asChild>
+                    <Link href="/dashboard/patient/appointments/new">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Book Appointment
+                    </Link>
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline" asChild>
+                    <Link href="/dashboard/patient/medical-history">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Medical Records
+                    </Link>
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline" onClick={() => setShowChatbot(true)}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Ask MediBuddy
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          
+          {/* Main content area */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Upcoming appointments card */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div>
+                  <CardTitle className="text-xl">Your Appointments</CardTitle>
+                  <CardDescription>Manage your upcoming and past consultations</CardDescription>
+                </div>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
+                  <Link href="/dashboard/patient/appointments/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Appointment
+                  </Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="upcoming" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                    <TabsTrigger value="past">Past</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="upcoming" className="space-y-4">
+                    {upcomingAppointments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">No upcoming appointments</p>
+                        <Button variant="outline" className="mt-4" asChild>
+                          <Link href="/dashboard/patient/appointments/new">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Book New Appointment
+                          </Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      upcomingAppointments.map(appointment => (
+                        <div key={appointment.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="flex">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={appointment.avatar} alt={appointment.doctorName} />
+                                <AvatarFallback>{appointment.doctorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                              </Avatar>
+                              <div className="ml-3">
+                                <h4 className="text-sm font-medium">{appointment.doctorName}</h4>
+                                <p className="text-xs text-gray-500">{appointment.specialty}</p>
+                              </div>
+                            </div>
+                            <Badge variant={appointment.status === "confirmed" ? "outline" : "secondary"}>
+                              {appointment.status}
+                            </Badge>
+                          </div>
+                          <div className="mt-4 flex items-center text-sm text-gray-500">
+                            <CalendarDays className="mr-2 h-4 w-4" />
+                            {format(appointment.date, "EEEE, MMM d, yyyy")}
+                            <Clock className="ml-4 mr-2 h-4 w-4" />
+                            {appointment.time}
+                          </div>
+                          <div className="mt-4 flex justify-between">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/dashboard/patient/appointments/${appointment.id}`}>
+                                View Details
+                              </Link>
+                            </Button>
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
+                              <Link href={`/dashboard/patient/appointments/${appointment.id}`}>
+                                <MessageSquare className="mr-2 h-4 w-4" />
+                                Start Chat
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+                  <TabsContent value="past" className="space-y-4">
+                    {pastAppointments.map(appointment => (
+                      <div key={appointment.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={appointment.avatar} alt={appointment.doctorName} />
+                              <AvatarFallback>{appointment.doctorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <div className="ml-3">
+                              <h4 className="text-sm font-medium">{appointment.doctorName}</h4>
+                              <p className="text-xs text-gray-500">{appointment.specialty}</p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary">{appointment.status}</Badge>
+                        </div>
+                        <div className="mt-4 flex items-center text-sm text-gray-500">
+                          <CalendarDays className="mr-2 h-4 w-4" />
+                          {format(appointment.date, "EEEE, MMM d, yyyy")}
+                          <Clock className="ml-4 mr-2 h-4 w-4" />
+                          {appointment.time}
+                        </div>
+                        <div className="mt-4 flex justify-between">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/dashboard/patient/appointments/${appointment.id}`}>
+                              View Summary
+                            </Link>
+                          </Button>
+                          <Button variant="secondary" size="sm" asChild>
+                            <Link href="/dashboard/patient/appointments/new">
+                              Book Follow-up
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+              <CardFooter className="border-t pt-4">
+                <Button variant="link" className="mx-auto" asChild>
+                  <Link href="/dashboard/patient/appointments">View All Appointments</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            {/* Health records summary */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div>
+                  <CardTitle className="text-xl">Health Records</CardTitle>
+                  <CardDescription>Recent prescriptions and test results</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard/patient/medical-history">
+                    View All
+                  </Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-sm font-medium">Blood Test Results</h4>
+                        <p className="text-xs text-gray-500">Uploaded on {format(addDays(new Date(), -5), "MMM d, yyyy")}</p>
+                      </div>
+                      <Badge>New</Badge>
+                    </div>
+                    <Button variant="link" size="sm" className="mt-2 p-0" asChild>
+                      <Link href="/dashboard/patient/medical-history">
+                        View Document
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-sm font-medium">Prescription - Amoxicillin</h4>
+                        <p className="text-xs text-gray-500">Issued by Dr. Emily Rodriguez on {format(addDays(new Date(), -7), "MMM d, yyyy")}</p>
+                      </div>
+                    </div>
+                    <Button variant="link" size="sm" className="mt-2 p-0" asChild>
+                      <Link href="/dashboard/patient/medical-history">
+                        View Document
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+      
+      {/* MediBuddy AI Chatbot */}
+      {showChatbot && (
+        <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-white rounded-lg shadow-lg w-full max-w-sm z-50 overflow-hidden border">
+          <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="bg-white rounded-full p-2 mr-2">
+                <MessageSquare className="h-4 w-4 text-blue-600" />
+              </div>
+              <h3 className="font-medium">MediBuddy</h3>
+            </div>
+            <button 
+              onClick={() => setShowChatbot(false)}
+              className="text-white hover:opacity-75"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-4 h-80 overflow-y-auto">
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <div className="bg-blue-600 text-white rounded-lg py-2 px-3 max-w-[80%]">
+                  <p className="text-sm">Hi John! I'm MediBuddy, your personal health assistant. How can I help you today?</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-center text-gray-500">Quick options</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" size="sm">Book appointment</Button>
+                  <Button variant="outline" size="sm">Medical advice</Button>
+                  <Button variant="outline" size="sm">My medications</Button>
+                  <Button variant="outline" size="sm">Contact support</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t p-3">
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-600"
+              />
+              <Button size="icon" className="ml-2 bg-blue-600 hover:bg-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Floating chatbot button (only shown when chatbot is hidden) */}
+      {!showChatbot && (
+        <button
+          onClick={() => setShowChatbot(true)}
+          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-shadow z-30"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </button>
+      )}
+    </div>
+  )
+}
+```
+
+## Required ShadCn/UI Components
+
+You'll need to install these additional shadcn/ui components:
+
+```bash
+npx shadcn@latest add dropdown-menu
+```
+
+## Key Features of the Revised Implementation
+
+1. **Proper Folder Structure**:
+   - Follows the provided file structure with layout at `dashboard/patient/layout.tsx`
+   - Main dashboard at `dashboard/patient/page.tsx`
+
+2. **Consistent Navigation**:
+   - Matches the landing page's navigation style with the Stethoscope icon and logo
+   - Adds authenticated user navigation including Dashboard, Appointments, Medical Records
+   - Includes dropdown menu for profile and logout functionality
+   - Responsive design with mobile menu toggle
+
+3. **Improved Dashboard Components**:
+   - Clean, properly styled cards and layout
+   - Blue color scheme matching the branding requirements
+   - Proper URL paths for navigation links matching the file structure
+
+4. **Functional & UX Enhancements**:
+   - Maintains all the core functionality from the previous implementation
+   - Consistent styling with the landing page
+   - Clear information hierarchy
+   - MediBuddy chatbot with blue branding
+
+This implementation correctly aligns with the file structure guidelines and maintains visual consistency with the landing page while providing all the necessary patient dashboard functionality.
+
+
+Reasoning: You're right. I missed that MediBuddy should be in its own component according to the file structure. In the provided structure, we see:
+
+```
+app/components/chatbot/
+    └── medi-buddy.tsx       # AI Chatbot Component
+```
+
+Let me create this component and adjust the patient dashboard to use it.
+
+I should:
+
+1. Create a proper component for MediBuddy in `app/components/chatbot/medi-buddy.tsx`
+2. Update the Patient Dashboard page to import and use this component instead of having the chatbot functionality inline
+
+Here's how I'll implement the MediBuddy component:
+
+# MediBuddy Chatbot Component
+
+Let me create a standalone MediBuddy component as required:
+
+```tsx
+// app/components/chatbot/medi-buddy.tsx
+"use client"
+
+import { useState } from "react"
+import { MessageSquare } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+interface MediBuddyProps {
+  userName?: string
+}
+
+export default function MediBuddy({ userName = "there" }: MediBuddyProps) {
+  const [isVisible, setIsVisible] = useState(false)
+  const [messages, setMessages] = useState([
+    {
+      text: `Hi ${userName}! I'm MediBuddy, your personal health assistant. How can I help you today?`,
+      sender: "bot"
+    }
+  ])
+  const [inputValue, setInputValue] = useState("")
+
+  const handleSend = () => {
+    if (inputValue.trim()) {
+      // Add user message
+      setMessages([...messages, { text: inputValue, sender: "user" }])
+      
+      // Simulate bot response (in a real app, this would call an API)
+      setTimeout(() => {
+        setMessages(prev => [...prev, { 
+          text: "I understand you're asking about " + inputValue + ". Let me help you with that.",
+          sender: "bot" 
+        }])
+      }, 1000)
+      
+      setInputValue("")
+    }
+  }
+
+  const quickOptions = [
+    { text: "Book appointment", action: () => {} },
+    { text: "Medical advice", action: () => {} },
+    { text: "My medications", action: () => {} },
+    { text: "Contact support", action: () => {} }
+  ]
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSend()
+    }
+  }
+
+  return (
+    <>
+      {/* Floating chatbot button */}
+      {!isVisible && (
+        <button
+          onClick={() => setIsVisible(true)}
+          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-shadow z-30"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </button>
+      )}
+
+      {/* Chatbot window */}
+      {isVisible && (
+        <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-white rounded-lg shadow-lg w-full max-w-sm z-50 overflow-hidden border">
+          {/* Chat header */}
+          <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="bg-white rounded-full p-2 mr-2">
+                <MessageSquare className="h-4 w-4 text-blue-600" />
+              </div>
+              <h3 className="font-medium">MediBuddy</h3>
+            </div>
+            <button 
+              onClick={() => setIsVisible(false)}
+              className="text-white hover:opacity-75"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          
+          {/* Chat messages */}
+          <div className="p-4 h-80 overflow-y-auto">
+            <div className="space-y-4">
+              {messages.map((message, index) => (
+                <div key={index} className={`flex items-start ${message.sender === 'user' ? 'justify-end' : ''}`}>
+                  <div className={`${
+                    message.sender === 'user' 
+                      ? 'bg-gray-100 text-gray-800' 
+                      : 'bg-blue-600 text-white'
+                    } rounded-lg py-2 px-3 max-w-[80%]`}
+                  >
+                    <p className="text-sm">{message.text}</p>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Quick options - show only for the first message */}
+              {messages.length === 1 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-center text-gray-500">Quick options</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {quickOptions.map((option, index) => (
+                      <Button 
+                        key={index} 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          setMessages([
+                            ...messages, 
+                            { text: option.text, sender: "user" },
+                            { text: `I'll help you with ${option.text.toLowerCase()}. What specifically do you need?`, sender: "bot" }
+                          ])
+                        }}
+                      >
+                        {option.text}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Chat input */}
+          <div className="border-t p-3">
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-600"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <Button 
+                size="icon" 
+                className="ml-2 bg-blue-600 hover:bg-blue-700"
+                onClick={handleSend}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+```
+
+Now, update the Patient Dashboard to use this component:
+
+```tsx
+// In app/dashboard/patient/page.tsx
+
+// Replace the MediBuddy chatbot section with:
+import MediBuddy from "@/components/chatbot/medi-buddy"
+
+// Then remove the entire chatbot UI code and add this line at the end of your component:
+return (
+  <div>
+    {/* Dashboard Content */}
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* ... all the existing dashboard UI ... */}
+    </div>
+    
+    {/* Add MediBuddy component */}
+    <MediBuddy userName="John" />
+  </div>
+)
+```
+
+This properly extracts the MediBuddy chatbot into its own component with the following improvements:
+
+1. **Component-Based Architecture**:
+   - Follows the recommended file structure
+   - Accepts props for personalization
+   - Can be reused across the application
+
+2. **Enhanced Features**:
+   - Maintains conversation history
+   - Dynamic message display based on sender
+   - Interactive quick option buttons
+   - Text input with Enter key support
+
+3. **Clean Integration**:
+   - Simple to add to any page with customized user name
+   - Consistent styling with the rest of the application
+   - Self-contained state management
+
+The component now correctly lives in `app/components/chatbot/medi-buddy.tsx` as per the provided folder structure.
